@@ -1,47 +1,60 @@
-// inputNode.js
+import React, { useState, useCallback } from "react";
+import { InboxIcon } from "@heroicons/react/24/outline";
 
-import { useState } from 'react';
-import { Handle, Position } from 'reactflow';
+import { createOutputHandle } from "../utils/nodeHelpers";
+import { BaseNode } from "../components/ui/BaseNode";
+import { FormField } from "../components/ui/FormField";
+import { Select } from "../components/ui/Select";
+import { Input } from "../components/ui/Input";
 
 export const InputNode = ({ id, data }) => {
-  const [currName, setCurrName] = useState(data?.inputName || id.replace('customInput-', 'input_'));
-  const [inputType, setInputType] = useState(data.inputType || 'Text');
+  const [inputName, setInputName] = useState(
+    data?.inputName || id.replace("customInput-", "input_")
+  );
+  const [inputType, setInputType] = useState(data?.inputType || "Text");
 
-  const handleNameChange = (e) => {
-    setCurrName(e.target.value);
-  };
+  const handleNameChange = useCallback((e) => {
+    setInputName(e.target.value);
+  }, []);
 
-  const handleTypeChange = (e) => {
+  const handleTypeChange = useCallback((e) => {
     setInputType(e.target.value);
-  };
+  }, []);
+
+  const typeOptions = [
+    { value: "Text", label: "Text" },
+    { value: "File", label: "File" },
+    { value: "Number", label: "Number" },
+    { value: "Boolean", label: "Boolean" },
+  ];
+
+  const handles = [createOutputHandle(`${id}-value`)];
 
   return (
-    <div style={{width: 200, height: 80, border: '1px solid black'}}>
-      <div>
-        <span>Input</span>
-      </div>
-      <div>
-        <label>
-          Name:
-          <input 
-            type="text" 
-            value={currName} 
-            onChange={handleNameChange} 
+    <BaseNode
+      id={id}
+      title="Input"
+      icon={InboxIcon}
+      variant="input"
+      handles={handles}
+    >
+      <div className="space-y-2">
+        <FormField label="Name">
+          <Input
+            type="text"
+            value={inputName}
+            onChange={handleNameChange}
+            placeholder="Enter input name"
           />
-        </label>
-        <label>
-          Type:
-          <select value={inputType} onChange={handleTypeChange}>
-            <option value="Text">Text</option>
-            <option value="File">File</option>
-          </select>
-        </label>
+        </FormField>
+        <FormField label="Type">
+          <Select
+            options={typeOptions}
+            value={inputType}
+            onChange={handleTypeChange}
+          />
+        </FormField>
       </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        id={`${id}-value`}
-      />
-    </div>
+    </BaseNode>
   );
-}
+};

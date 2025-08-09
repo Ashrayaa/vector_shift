@@ -1,35 +1,35 @@
-// textNode.js
-
-import { useState } from 'react';
-import { Handle, Position } from 'reactflow';
+import React, { useState, useCallback } from "react";
+import { DocumentTextIcon } from "@heroicons/react/24/outline";
+import { BaseNode } from "../components/ui/BaseNode";
+import { FormField } from "../components/ui/FormField";
+import { createOutputHandle } from "../utils/nodeHelpers";
+import { Textarea } from "../components/ui/Textarea";
 
 export const TextNode = ({ id, data }) => {
-  const [currText, setCurrText] = useState(data?.text || '{{input}}');
+  const [text, setText] = useState(data?.text || "{{input}}");
 
-  const handleTextChange = (e) => {
-    setCurrText(e.target.value);
-  };
+  const handleTextChange = useCallback((e) => {
+    setText(e.target.value);
+  }, []);
+
+  const handles = [createOutputHandle(`${id}-output`)];
 
   return (
-    <div style={{width: 200, height: 80, border: '1px solid black'}}>
-      <div>
-        <span>Text</span>
-      </div>
-      <div>
-        <label>
-          Text:
-          <input 
-            type="text" 
-            value={currText} 
-            onChange={handleTextChange} 
-          />
-        </label>
-      </div>
-      <Handle
-        type="source"
-        position={Position.Right}
-        id={`${id}-output`}
-      />
-    </div>
+    <BaseNode
+      id={id}
+      title="Text"
+      icon={DocumentTextIcon}
+      variant="process"
+      handles={handles}
+    >
+      <FormField label="Content">
+        <Textarea
+          value={text}
+          onChange={handleTextChange}
+          placeholder="Enter text content..."
+          rows={3}
+        />
+      </FormField>
+    </BaseNode>
   );
-}
+};

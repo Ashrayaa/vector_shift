@@ -1,47 +1,59 @@
-// outputNode.js
-
-import { useState } from 'react';
-import { Handle, Position } from 'reactflow';
+import React, { useState, useCallback } from "react";
+import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
+import { BaseNode } from "../components/ui/BaseNode";
+import { FormField } from "../components/ui/FormField";
+import { Select } from "../components/ui/Select";
+import { Input } from "../components/ui/Input";
+import { createInputHandle } from "../utils/nodeHelpers";
 
 export const OutputNode = ({ id, data }) => {
-  const [currName, setCurrName] = useState(data?.outputName || id.replace('customOutput-', 'output_'));
-  const [outputType, setOutputType] = useState(data.outputType || 'Text');
+  const [outputName, setOutputName] = useState(
+    data?.outputName || id.replace("customOutput-", "output_")
+  );
+  const [outputType, setOutputType] = useState(data?.outputType || "Text");
 
-  const handleNameChange = (e) => {
-    setCurrName(e.target.value);
-  };
+  const handleNameChange = useCallback((e) => {
+    setOutputName(e.target.value);
+  }, []);
 
-  const handleTypeChange = (e) => {
+  const handleTypeChange = useCallback((e) => {
     setOutputType(e.target.value);
-  };
+  }, []);
+
+  const typeOptions = [
+    { value: "Text", label: "Text" },
+    { value: "Image", label: "Image" },
+    { value: "File", label: "File" },
+    { value: "JSON", label: "JSON" },
+  ];
+
+  const handles = [createInputHandle(`${id}-value`)];
 
   return (
-    <div style={{width: 200, height: 80, border: '1px solid black'}}>
-      <Handle
-        type="target"
-        position={Position.Left}
-        id={`${id}-value`}
-      />
-      <div>
-        <span>Output</span>
-      </div>
-      <div>
-        <label>
-          Name:
-          <input 
-            type="text" 
-            value={currName} 
-            onChange={handleNameChange} 
+    <BaseNode
+      id={id}
+      title="Output"
+      icon={DocumentArrowDownIcon}
+      variant="output"
+      handles={handles}
+    >
+      <div className="space-y-2">
+        <FormField label="Name">
+          <Input
+            type="text"
+            value={outputName}
+            onChange={handleNameChange}
+            placeholder="Enter output name"
           />
-        </label>
-        <label>
-          Type:
-          <select value={outputType} onChange={handleTypeChange}>
-            <option value="Text">Text</option>
-            <option value="File">Image</option>
-          </select>
-        </label>
+        </FormField>
+        <FormField label="Type">
+          <Select
+            options={typeOptions}
+            value={outputType}
+            onChange={handleTypeChange}
+          />
+        </FormField>
       </div>
-    </div>
+    </BaseNode>
   );
-}
+};
