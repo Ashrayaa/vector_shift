@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { PlayIcon, StopIcon } from '@heroicons/react/24/solid';
+import { PipelineAlert } from './PipelineAlert';
 
 export const SubmitButton = ({ nodes, edges, onSubmit, onStop, isRunning = false }) => {
   const [loading, setLoading] = useState(false);
   const [lastResponse, setLastResponse] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleClick = async () => {
     if (isRunning) {
@@ -38,24 +40,7 @@ export const SubmitButton = ({ nodes, edges, onSubmit, onStop, isRunning = false
 
       const data = await response.json();
       setLastResponse(data);
-
-      // Show user-friendly alert
-      const dagStatus = data.is_dag
-        ? "✅ Valid DAG"
-        : "❌ Not a DAG (contains cycles)";
-      const message = `Pipeline Analysis Results:
-
-📊 Number of Nodes: ${data.num_nodes}
-🔗 Number of Edges: ${data.num_edges}
-🔄 Graph Structure: ${dagStatus}
-
-${
-  data.is_dag
-    ? "Great! Your pipeline is properly structured and ready to execute."
-    : "Warning: Your pipeline contains circular dependencies. Please review the connections."
-}`;
-
-      alert(message);
+      setShowAlert(true);
 
       // Call external onSubmit if provided
       if (onSubmit) {
@@ -110,6 +95,12 @@ ${
           {lastResponse.is_dag ? " Valid DAG ✅" : " Contains cycles ❌"}
         </div>
       )}
+      
+      {/* Modern Alert Component */}
+      <PipelineAlert 
+        analysisData={showAlert ? lastResponse : null} 
+        onClose={() => setShowAlert(false)} 
+      />
     </div>
   );
 };

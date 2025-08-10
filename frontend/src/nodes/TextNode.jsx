@@ -154,11 +154,6 @@ export const TextNode = ({ id, data }) => {
             rows={1}
           />
         </FormField>
-        
-        {/* Helper Text */}
-        {/* <div className="mt-2 text-xs opacity-60">
-          Use {{ variableName }} to create input handles
-        </div> */}
       </div>
     </div>
   );

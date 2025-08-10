@@ -107,48 +107,6 @@ The foundation component that provides:
 - Position management utilities
 - Node type constants
 
-## Creating New Nodes
-
-### Basic Pattern
-```javascript
-import React, { useState, useCallback } from 'react';
-import { BaseNode, FormField, Input } from '../components/ui';
-import { createInputHandle, createOutputHandle } from '../utils/nodeHelpers';
-
-export const YourNode = ({ id, data }) => {
-  // State management with useCallback for performance
-  const [value, setValue] = useState(data?.value || '');
-  
-  const handleValueChange = useCallback((e) => {
-    setValue(e.target.value);
-  }, []);
-
-  // Define handles
-  const handles = [
-    createInputHandle(`${id}-input`),
-    createOutputHandle(`${id}-output`)
-  ];
-
-  return (
-    <BaseNode
-      id={id}
-      title="Your Node"
-      icon={YourIcon}
-      variant="process"
-      handles={handles}
-    >
-      <FormField label="Value">
-        <Input
-          value={value}
-          onChange={handleValueChange}
-          placeholder="Enter value"
-        />
-      </FormField>
-    </BaseNode>
-  );
-};
-```
-
 ### Node Variants
 - `input`: Blue theme for input nodes
 - `output`: Green theme for output nodes  
@@ -193,32 +151,11 @@ export const YourNode = ({ id, data }) => {
 ### 1. useCallback Pattern
 All event handlers use `useCallback` to prevent unnecessary re-renders:
 
-```javascript
-const handleChange = useCallback((e) => {
-  setValue(e.target.value);
-}, []);
-```
-
 ### 2. Stable Handle Definitions
 Handles are defined outside render to prevent React Flow re-connections:
 
-```javascript
-const handles = [
-  createInputHandle(`${id}-input`),
-  createOutputHandle(`${id}-output`)
-];
-```
-
 ### 3. Conditional Rendering
 Only render complex UI elements when needed:
-
-```javascript
-{operation === 'custom' && (
-  <FormField label="Custom Code">
-    <Textarea ... />
-  </FormField>
-)}
-```
 
 ## Styling System
 
@@ -249,29 +186,8 @@ Follow the pattern shown above in `/nodes/YourNode.jsx`
 ### Step 2: Register Node Type
 Add to `/nodeTypes.js`:
 
-```javascript
-import { YourNode } from './nodes/YourNode';
-
-export const nodeTypes = {
-  // ... existing nodes
-  yourNode: YourNode,
-};
-```
-
 ### Step 3: Add to Categories
 Update `nodeCategories` in `/nodeTypes.js`:
-
-```javascript
-export const nodeCategories = {
-  'Your Category': [
-    { 
-      type: 'yourNode', 
-      label: 'Your Node', 
-      description: 'Description of your node' 
-    },
-  ],
-};
-```
 
 ## Error Prevention
 
