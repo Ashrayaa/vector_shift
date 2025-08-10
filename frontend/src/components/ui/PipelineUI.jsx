@@ -9,7 +9,6 @@ import ReactFlow, {
 } from 'reactflow';
 import { nodeTypes } from '../../nodeTypes';
 
-
 const initialNodes = [
   {
     id: '1',
@@ -19,14 +18,20 @@ const initialNodes = [
   },
   {
     id: '2',
-    type: 'llm',
-    position: { x: 400, y: 100 },
-    data: { model: 'gpt-4', temperature: 0.7 },
+    type: 'text',
+    position: { x: 300, y: 100 },
+    data: { text: 'Hello {{ user_input }}, welcome to our {{ platform }}!' },
   },
   {
     id: '3',
+    type: 'llm',
+    position: { x: 500, y: 100 },
+    data: { model: 'gpt-4', temperature: 0.7 },
+  },
+  {
+    id: '4',
     type: 'customOutput',
-    position: { x: 700, y: 100 },
+    position: { x: 800, y: 100 },
     data: { outputName: 'response', outputType: 'Text' },
   },
 ];
@@ -37,18 +42,25 @@ const initialEdges = [
     source: '1',
     target: '2',
     sourceHandle: '1-value',
-    targetHandle: '2-prompt',
+    targetHandle: '2-user_input',
   },
   {
     id: 'e2-3',
     source: '2',
     target: '3',
-    sourceHandle: '2-response',
-    targetHandle: '3-value',
+    sourceHandle: '2-output',
+    targetHandle: '3-prompt',
+  },
+  {
+    id: 'e3-4',
+    source: '3',
+    target: '4',
+    sourceHandle: '3-response',
+    targetHandle: '4-value',
   },
 ];
 
-export const PipelineUI = ({ onAddNode: addNodeFromToolbar }) => {
+export const PipelineUI = ({ onAddNode: addNodeFromToolbar, onNodesEdgesChange }) => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
@@ -67,6 +79,13 @@ export const PipelineUI = ({ onAddNode: addNodeFromToolbar }) => {
     setNodes((nds) => [...nds, newNode]);
   }, [setNodes]);
 
+  // Notify parent component of nodes/edges changes
+  React.useEffect(() => {
+    if (onNodesEdgesChange) {
+      onNodesEdgesChange(nodes, edges);
+    }
+  }, [nodes, edges, onNodesEdgesChange]);
+
   // Connect toolbar add node functionality
   React.useEffect(() => {
     if (addNodeFromToolbar) {
@@ -75,7 +94,7 @@ export const PipelineUI = ({ onAddNode: addNodeFromToolbar }) => {
   }, [addNode, addNodeFromToolbar]);
 
   return (
-    <div className="h-96 bg-slate-800">
+    <div className="h-[calc(100vh-200px)] bg-slate-800">
       <ReactFlow
         nodes={nodes}
         edges={edges}

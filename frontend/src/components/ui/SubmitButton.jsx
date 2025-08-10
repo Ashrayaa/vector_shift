@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { PlayIcon, StopIcon } from '@heroicons/react/24/solid';
 
-export const SubmitButton = ({ onSubmit, onStop, isRunning = false }) => {
+export const SubmitButton = ({ nodes, edges, onSubmit, onStop, isRunning = false }) => {
   const [loading, setLoading] = useState(false);
+  const [lastResponse, setLastResponse] = useState(null);
 
   const handleClick = async () => {
     if (isRunning) {
@@ -10,9 +11,61 @@ export const SubmitButton = ({ onSubmit, onStop, isRunning = false }) => {
       return;
     }
 
+    if (!nodes || !edges) {
+      alert("No pipeline data available. Please ensure nodes and edges are loaded.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await onSubmit?.();
+      console.log("Submitting pipeline with", nodes.length, "nodes and", edges.length, "edges");
+      
+      // Submit to backend for analysis
+      const response = await fetch("http://localhost:8000/pipelines/parse", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nodes: nodes,
+          edges: edges,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setLastResponse(data);
+
+      // Show user-friendly alert
+      const dagStatus = data.is_dag
+        ? "✅ Valid DAG"
+        : "❌ Not a DAG (contains cycles)";
+      const message = `Pipeline Analysis Results:
+
+📊 Number of Nodes: ${data.num_nodes}
+🔗 Number of Edges: ${data.num_edges}
+🔄 Graph Structure: ${dagStatus}
+
+${
+  data.is_dag
+    ? "Great! Your pipeline is properly structured and ready to execute."
+    : "Warning: Your pipeline contains circular dependencies. Please review the connections."
+}`;
+
+      alert(message);
+
+      // Call external onSubmit if provided
+      if (onSubmit) {
+        await onSubmit(data);
+      }
+    } catch (error) {
+      console.error("Error submitting pipeline:", error);
+      alert(
+        `Error submitting pipeline: ${error.message}. Please check if the backend server is running on http://localhost:8000`
+      );
     } finally {
       setLoading(false);
     }
@@ -37,7 +90,7 @@ export const SubmitButton = ({ onSubmit, onStop, isRunning = false }) => {
           ) : (
             <PlayIcon className="w-5 h-5" />
           )}
-          {loading ? 'Processing...' : isRunning ? 'Stop Pipeline' : 'Run Pipeline'}
+          {loading ? 'Analyzing...' : isRunning ? 'Stop Pipeline' : 'Run Pipeline'}
         </button>
 
         <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
@@ -48,6 +101,15 @@ export const SubmitButton = ({ onSubmit, onStop, isRunning = false }) => {
           Export
         </button>
       </div>
+
+      {/* Display last analysis result */}
+      {lastResponse && (
+        <div className="mt-3 text-center text-sm text-gray-400">
+          Last analysis: {lastResponse.num_nodes} nodes,{" "}
+          {lastResponse.num_edges} edges,
+          {lastResponse.is_dag ? " Valid DAG ✅" : " Contains cycles ❌"}
+        </div>
+      )}
     </div>
   );
 };

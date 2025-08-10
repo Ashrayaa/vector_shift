@@ -1,4 +1,4 @@
-// /frontend/src/components/PipelineToolbar.jsx
+
 import React, { useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { nodeCategories } from '../../nodeTypes';
@@ -56,7 +56,3 @@ export const PipelineToolbar = ({ onAddNode }) => {
     </div>
   );
 };
-
-// /frontend/src/components/PipelineUI.jsx  
-
-// /frontend/src/components/SubmitButton.jsx
