@@ -1,25 +1,23 @@
-// /frontend/src/nodeTypes.js
-
-// import { FilterNode } from "./nodes/FilterNode";
-// import { TransformNode } from "./nodes/TransformNode";
-// import { DelayNode } from "./nodes/DelayNode";
-// import { ConditionalNode } from "./nodes/ConditionalNode";
-// import { DatabaseNode } from "./nodes/DatabaseNode";
-import { InputNode } from "./nodes/inputNode";
-import { OutputNode } from "./nodes/outputNode";
-import { LLMNode } from "./nodes/llmNode";
-import { TextNode } from "./nodes/textNode";
+import { ConditionalNode } from "./nodes/ConditionalNode";
+import { DatabaseNode } from "./nodes/DatabaseNode";
+import { DelayNode } from "./nodes/DelayNode";
+import { FilterNode } from "./nodes/FilterNode";
+import { InputNode } from "./nodes/InputNode.jsx";
+import { LLMNode } from "./nodes/LlmNode.jsx";
+import { OutputNode } from "./nodes/OutputNode.jsx";
+import { TextNode } from "./nodes/TextNode.jsx";
+import { TransformNode } from "./nodes/TransformNode";
 
 export const nodeTypes = {
   customInput: InputNode,
   customOutput: OutputNode,
   llm: LLMNode,
   text: TextNode,
-  //   filter: FilterNode,
-  //   transform: TransformNode,
-  //   delay: DelayNode,
-  //   conditional: ConditionalNode,
-  //   database: DatabaseNode,
+  filter: FilterNode,
+  transform: TransformNode,
+  delay: DelayNode,
+  conditional: ConditionalNode,
+  database: DatabaseNode,
 };
 
 // Node creation helpers for easy addition of new nodes
